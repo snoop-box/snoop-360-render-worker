@@ -163,7 +163,7 @@ async function renderVideo(input, output) {
         // BRANDING OVERLAY
         // =========================
 
-        "[vcat][1:v]overlay=0:0[vbranded]",
+        "[vcat][1:v]overlay=(main_w-overlay_w)/2:main_h-overlay_h-20[vbranded]",
 
         // =========================
         // FADE IN / OUT
