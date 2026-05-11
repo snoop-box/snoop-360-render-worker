@@ -18,6 +18,10 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
+/* =========================================
+   RENDER 360
+========================================= */
+
 app.post("/render360", async (req, res) => {
 
   try {
@@ -27,11 +31,25 @@ app.post("/render360", async (req, res) => {
       eventId
     } = req.body;
 
+    if (!videoUrl) {
+
+      return res.status(400).json({
+        success: false,
+        error: "videoUrl requerido"
+      });
+    }
+
+    const finalEventId = eventId || "default-event";
+
     await fs.ensureDir("temp");
 
-    const inputPath = `temp/input-${Date.now()}.mp4`;
+    const inputPath =
+      `temp/input-${Date.now()}.mp4`;
 
-    console.log("DESCARGANDO VIDEO...");
+    const outputPath =
+      `temp/final-${Date.now()}.mp4`;
+
+    console.log("⬇ DESCARGANDO VIDEO...");
 
     const response = await axios({
       url: videoUrl,
@@ -39,7 +57,8 @@ app.post("/render360", async (req, res) => {
       responseType: "stream"
     });
 
-    const writer = fs.createWriteStream(inputPath);
+    const writer =
+      fs.createWriteStream(inputPath);
 
     response.data.pipe(writer);
 
@@ -48,23 +67,29 @@ app.post("/render360", async (req, res) => {
       writer.on("finish", resolve);
 
       writer.on("error", reject);
+
     });
 
-    const outputPath = `temp/final-${Date.now()}.mp4`;
-
-    console.log("GENERANDO VIDEO CINEMATIC...");
+    console.log("🎬 GENERANDO VIDEO CINEMATIC...");
 
     await renderVideo(inputPath, outputPath);
 
-    console.log("SUBIENDO VIDEO FINAL...");
+    console.log("☁ SUBIENDO VIDEO FINAL...");
 
-    const uploadResult = await cloudinary.uploader.upload(outputPath, {
-      resource_type: "video",
-      folder: `snoopbox/${eventId}/360/rendered`
-    });
+    const uploadResult =
+      await cloudinary.uploader.upload(
+        outputPath,
+        {
+          resource_type: "video",
+          folder:
+            `snoopbox/${finalEventId}/360/rendered`
+        }
+      );
 
     await fs.remove(inputPath);
     await fs.remove(outputPath);
+
+    console.log("✅ RENDER FINAL OK");
 
     res.json({
       success: true,
@@ -82,62 +107,79 @@ app.post("/render360", async (req, res) => {
   }
 });
 
+/* =========================================
+   RENDER ENGINE
+========================================= */
+
 async function renderVideo(input, output) {
 
   return new Promise((resolve, reject) => {
 
-    ffmpeg(input)
+    ffmpeg()
+
+      .input(input)
+
+      .input("assets/branding-overlay.png")
 
       .complexFilter([
 
-  // =========================
-  // BASE LOOK
-  // =========================
+        // =========================
+        // BASE LOOK
+        // =========================
 
-  "[0:v]eq=contrast=1.10:saturation=1.18:brightness=0.02,unsharp=5:5:1.2:5:5:0.0[vbase]",
+        "[0:v]eq=contrast=1.10:saturation=1.18:brightness=0.02,unsharp=5:5:1.2:5:5:0.0[vbase]",
 
-  // =========================
-  // NORMAL
-  // =========================
+        // =========================
+        // NORMAL
+        // =========================
 
-  "[vbase]trim=0:5,setpts=PTS-STARTPTS[v1]",
+        "[vbase]trim=0:5,setpts=PTS-STARTPTS[v1]",
 
-  // =========================
-  // SLOW MOTION
-  // =========================
+        // =========================
+        // SLOW MOTION
+        // =========================
 
-  "[vbase]trim=5:9,setpts=2.0*(PTS-STARTPTS)[v2]",
+        "[vbase]trim=5:9,setpts=2.0*(PTS-STARTPTS)[v2]",
 
-  // =========================
-  // FAST
-  // =========================
+        // =========================
+        // FAST
+        // =========================
 
-  "[vbase]trim=9:12,setpts=0.6*(PTS-STARTPTS),tblend=average[v3]",
+        "[vbase]trim=9:12,setpts=0.6*(PTS-STARTPTS),tblend=average[v3]",
 
-  // =========================
-  // REVERSE
-  // =========================
+        // =========================
+        // REVERSE
+        // =========================
 
-  "[vbase]trim=9:12,reverse,setpts=PTS-STARTPTS[v4]",
+        "[vbase]trim=9:12,reverse,setpts=PTS-STARTPTS[v4]",
 
-  // =========================
-  // CONCAT
-  // =========================
+        // =========================
+        // CONCAT
+        // =========================
 
-  "[v1][v2][v3][v4]concat=n=4:v=1:a=0[vcat]",
+        "[v1][v2][v3][v4]concat=n=4:v=1:a=0[vcat]",
 
-  // =========================
-  // FADE IN / OUT
-  // =========================
+        // =========================
+        // BRANDING OVERLAY
+        // =========================
 
-  "[vcat]fade=t=in:st=0:d=1,fade=t=out:st=18:d=2[outv]"
+        "[vcat][1:v]overlay=0:0[vbranded]",
 
-])
+        // =========================
+        // FADE IN / OUT
+        // =========================
+
+        "[vbranded]fade=t=in:st=0:d=1,fade=t=out:st=18:d=2[outv]"
+
+      ])
+
       .outputOptions([
+
         "-map [outv]",
         "-preset fast",
         "-crf 18",
         "-movflags +faststart"
+
       ])
 
       .videoCodec("libx264")
@@ -146,7 +188,7 @@ async function renderVideo(input, output) {
 
       .on("end", () => {
 
-        console.log("RENDER FINAL OK");
+        console.log("🎉 VIDEO RENDERIZADO");
 
         resolve();
       })
@@ -157,10 +199,19 @@ async function renderVideo(input, output) {
 
         reject(err);
       });
+
   });
 }
 
-app.listen(process.env.PORT || 3000, () => {
+/* =========================================
+   SERVER
+========================================= */
 
-  console.log("RENDER WORKER ONLINE");
+const PORT =
+  process.env.PORT || 3000;
+
+app.listen(PORT, () => {
+
+  console.log("🚀 RENDER WORKER ONLINE");
+
 });
