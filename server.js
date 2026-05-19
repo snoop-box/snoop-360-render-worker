@@ -183,17 +183,9 @@ ffmpeg()
 "assets/intro.png"
 )
 
-.inputOptions([
-"-loop 1"
-])
-
 .input(
 "assets/outro.png"
 )
-
-.inputOptions([
-"-loop 1"
-])
 
 .complexFilter([
 
@@ -223,11 +215,11 @@ ffmpeg()
 
 // INTRO 2 SEG
 
-"[2:v]scale=1080:1920,trim=duration=2,setpts=PTS-STARTPTS[vintro]",
+"[2:v]fps=30,scale=1080:1920,trim=duration=2,setpts=PTS-STARTPTS[vintro]",
 
 // OUTRO 2 SEG
 
-"[3:v]scale=1080:1920,trim=duration=2,setpts=PTS-STARTPTS[voutro]",
+"[3:v]fps=30,scale=1080:1920,trim=duration=2,setpts=PTS-STARTPTS[voutro]",
 
 // VIDEO FINAL
 
@@ -242,10 +234,6 @@ ffmpeg()
 .outputOptions([
 
 "-map [outv]",
-
-"-map 4:a",
-
-"-shortest",
 
 "-preset fast",
 
