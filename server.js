@@ -162,9 +162,9 @@ async function renderVideo(input, output) {
 // SNOOP FIXED BRAND
 // =========================
 
-"[1:v]scale=140:-1[vlogo]",
+"[1:v]scale=280:-1[vlogo]",
 
-"[vcat][vlogo]overlay=W-w-30:H-h-30[vbranded]",
+"[vcat][vlogo]overlay=W-w-70:H-h-120[vbranded]",
 
 // =========================
 // FADE IN / OUT
