@@ -121,58 +121,47 @@ async function renderVideo(input, output) {
 
       .input("assets/branding-overlay.png")
 
-      .complexFilter([
+  .complexFilter([
 
-        // =========================
+// =========================
+
 // ORIENTATION + BASE LOOK
+
 // =========================
 
-"[0:v]eq=contrast=1.10:saturation=1.18:brightness=0.02,unsharp=5:5:1.2:5:5:0.0[vbase]",
-        // =========================
-        // NORMAL
-        // =========================
+"[0:v]transpose=1,scale=1080:1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2,eq=contrast=1.10:saturation=1.18:brightness=0.02,unsharp=5:5:1.2:5:5:0.0[vbase]",
 
-        "[vbase]trim=0:5,setpts=PTS-STARTPTS[v1]",
+// NORMAL
 
-        // =========================
-        // SLOW MOTION
-        // =========================
+"[vbase]trim=0:5,setpts=PTS-STARTPTS[v1]",
 
-        "[vbase]trim=5:9,setpts=2.0*(PTS-STARTPTS)[v2]",
+// SLOW
 
-        // =========================
-        // FAST
-        // =========================
+"[vbase]trim=5:9,setpts=2.0*(PTS-STARTPTS)[v2]",
 
-        "[vbase]trim=9:12,setpts=0.6*(PTS-STARTPTS),tblend=average[v3]",
+// FAST
 
-        // =========================
-        // REVERSE
-        // =========================
+"[vbase]trim=9:12,setpts=0.6*(PTS-STARTPTS),tblend=average[v3]",
 
-        "[vbase]trim=9:12,reverse,setpts=PTS-STARTPTS[v4]",
+// REVERSE
 
-        // =========================
-        // CONCAT
-        // =========================
+"[vbase]trim=9:12,reverse,setpts=PTS-STARTPTS[v4]",
 
-        "[v1][v2][v3][v4]concat=n=4:v=1:a=0[vcat]",
+// CONCAT
 
- // =========================
-// SNOOP FIXED BRAND
-// =========================
+"[v1][v2][v3][v4]concat=n=4:v=1:a=0[vcat]",
+
+// LOGO
 
 "[1:v]scale=280:-1[vlogo]",
 
-"[vcat][vlogo]overlay=W-w-70:H-h-120[vbranded]",
+"[vcat][vlogo]overlay=W-w-70:H-h-90[vbranded]",
 
-// =========================
-// FADE IN / OUT
-// =========================
+// FADE
 
 "[vbranded]fade=t=in:st=0:d=1,fade=t=out:st=16:d=2[outv]"
 
-      ])
+])
 
       .outputOptions([
 
