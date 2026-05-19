@@ -181,7 +181,7 @@ ffmpeg()
 
 .complexFilter([
 
-"[0:v]transpose=1,scale=1080:1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2,eq=contrast=1.10:saturation=1.18:brightness=0.02,unsharp=5:5:1.2:5:5:0.0[vbase]",
+"[0:v]eq=contrast=1.10:saturation=1.18:brightness=0.02,unsharp=5:5:1.2:5:5:0.0[vbase]",
 
 "[vbase]trim=0:5,setpts=PTS-STARTPTS[v1]",
 
