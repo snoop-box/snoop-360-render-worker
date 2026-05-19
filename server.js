@@ -179,97 +179,31 @@ ffmpeg()
 "assets/branding-overlay.png"
 )
 
-.input(
-"assets/intro.png"
-)
-
-.input(
-"assets/outro.png"
-)
-
-.input(
-"assets/music.mp3"
-)
-
-.inputOptions([
-"-loop 1",
-"-loop 1"
-])
-
 .complexFilter([
 
-// VIDEO BASE VERTICAL
-
-`
-[0:v]
-transpose=1,
-scale=1080:1920:
-force_original_aspect_ratio=decrease,
-pad=1080:1920:
-(ow-iw)/2:
-(oh-ih)/2,
-eq=
-contrast=1.10:
-saturation=1.18:
-brightness=0.02,
-unsharp=
-5:5:1.2:
-5:5:0
-[vbase]
-`,
-
-// BLOQUES
+"[0:v]transpose=1,scale=1080:1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2,eq=contrast=1.10:saturation=1.18:brightness=0.02,unsharp=5:5:1.2:5:5:0.0[vbase]",
 
 "[vbase]trim=0:5,setpts=PTS-STARTPTS[v1]",
 
-"[vbase]trim=5:9,setpts=2*(PTS-STARTPTS)[v2]",
+"[vbase]trim=5:9,setpts=2.0*(PTS-STARTPTS)[v2]",
 
 "[vbase]trim=9:12,setpts=0.6*(PTS-STARTPTS),tblend=average[v3]",
 
 "[vbase]trim=9:12,reverse,setpts=PTS-STARTPTS[v4]",
 
-// CORE
+"[v1][v2][v3][v4]concat=n=4:v=1:a=0[vcat]",
 
-"[v1][v2][v3][v4]concat=n=4:v=1:a=0[vcore]",
+"[1:v]scale=240:-1[vlogo]",
 
-// LOGO
+"[vcat][vlogo]overlay=W-w-50:H-h-120[vbrand]",
 
-"[1:v]scale=220:-1[vlogo]",
-
-"[vcore][vlogo]overlay=W-w-50:H-h-110[vbrand]",
-
-// INTRO
-
-"[2:v]scale=1080:1920[vintro]",
-
-// OUTRO
-
-"[3:v]scale=1080:1920[voutro]",
-
-// CONCAT FINAL
-
-"[vintro][vbrand][voutro]concat=n=3:v=1:a=0[vfinal]",
-
-// FADE
-
-`
-[vfinal]
-fade=t=in:st=0:d=1,
-fade=t=out:st=19:d=1
-[outv]
-`
+"[vbrand]fade=t=in:st=0:d=1,fade=t=out:st=16:d=2[outv]"
 
 ])
 
 .outputOptions([
 
 "-map [outv]",
-
-"-map 4:a",
-
-"-t 20",
-
-"-shortest",
 
 "-preset fast",
 
@@ -279,17 +213,9 @@ fade=t=out:st=19:d=1
 
 ])
 
-.videoCodec(
-"libx264"
-)
+.videoCodec("libx264")
 
-.audioCodec(
-"aac"
-)
-
-.save(
-output
-)
+.save(output)
 
 .on(
 "end",
