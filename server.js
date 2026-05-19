@@ -34,163 +34,293 @@ app.post("/render360", async (req, res) => {
     if (!videoUrl) {
 
       return res.status(400).json({
-        success: false,
-        error: "videoUrl requerido"
+        success:false,
+        error:"videoUrl requerido"
       });
+
     }
 
-    const finalEventId = eventId || "default-event";
+    const finalEventId =
+      eventId || "default-event";
 
     await fs.ensureDir("temp");
 
+    const stamp = Date.now();
+
     const inputPath =
-      `temp/input-${Date.now()}.mp4`;
+      `temp/input-${stamp}.mp4`;
 
     const outputPath =
-      `temp/final-${Date.now()}.mp4`;
+      `temp/output-${stamp}.mp4`;
 
-    console.log("⬇ DESCARGANDO VIDEO...");
+    console.log(
+      "⬇ DESCARGANDO VIDEO..."
+    );
 
-    const response = await axios({
-      url: videoUrl,
-      method: "GET",
-      responseType: "stream"
-    });
+    const response =
+      await axios({
+
+        url:videoUrl,
+        method:"GET",
+        responseType:"stream"
+
+      });
 
     const writer =
-      fs.createWriteStream(inputPath);
+      fs.createWriteStream(
+        inputPath
+      );
 
-    response.data.pipe(writer);
+    response.data.pipe(
+      writer
+    );
 
-    await new Promise((resolve, reject) => {
+    await new Promise(
+      (resolve,reject)=>{
 
-      writer.on("finish", resolve);
+        writer.on(
+          "finish",
+          resolve
+        );
 
-      writer.on("error", reject);
+        writer.on(
+          "error",
+          reject
+        );
 
-    });
+      }
+    );
 
-    console.log("🎬 GENERANDO VIDEO CINEMATIC...");
+    console.log(
+      "🎬 GENERANDO VIDEO..."
+    );
 
-    await renderVideo(inputPath, outputPath);
+    await renderVideo(
+      inputPath,
+      outputPath
+    );
 
-    console.log("☁ SUBIENDO VIDEO FINAL...");
+    console.log(
+      "☁ SUBIENDO FINAL..."
+    );
 
     const uploadResult =
-      await cloudinary.uploader.upload(
+      await cloudinary
+      .uploader
+      .upload(
         outputPath,
         {
-          resource_type: "video",
+          resource_type:
+          "video",
+
           folder:
-            `snoopbox/${finalEventId}/360/rendered`
+`snoopbox/${finalEventId}/360/rendered`
         }
       );
 
-    await fs.remove(inputPath);
-    await fs.remove(outputPath);
+    await fs.remove(
+      inputPath
+    );
 
-    console.log("✅ RENDER FINAL OK");
+    await fs.remove(
+      outputPath
+    );
+
+    console.log(
+      "✅ RENDER FINAL OK"
+    );
 
     res.json({
-      success: true,
-      renderedUrl: uploadResult.secure_url
+
+      success:true,
+
+      renderedUrl:
+      uploadResult.secure_url
+
     });
 
-  } catch (error) {
+  }
 
-    console.error(error);
+  catch(error){
+
+    console.error(
+      error
+    );
 
     res.status(500).json({
-      success: false,
-      error: error.message
+
+      success:false,
+
+      error:error.message
+
     });
+
   }
+
 });
 
 /* =========================================
    RENDER ENGINE
 ========================================= */
 
-async function renderVideo(input, output) {
+async function renderVideo(
+  input,
+  output
+){
 
-  return new Promise((resolve, reject) => {
+return new Promise(
+(resolve,reject)=>{
 
-    ffmpeg()
+ffmpeg()
 
-      .input(input)
+.input(input)
 
-      .input("assets/branding-overlay.png")
+.input(
+"assets/branding-overlay.png"
+)
 
-  .complexFilter([
+.input(
+"assets/intro.png"
+)
 
-// =========================
+.input(
+"assets/outro.png"
+)
 
-// ORIENTATION + BASE LOOK
+.input(
+"assets/music.mp3"
+)
 
-// =========================
+.inputOptions([
+"-loop 1",
+"-loop 1"
+])
 
-"[0:v]eq=contrast=1.10:saturation=1.18:brightness=0.02,unsharp=5:5:1.2:5:5:0.0[vbase]",
+.complexFilter([
 
-// NORMAL
+// VIDEO BASE VERTICAL
+
+`
+[0:v]
+transpose=1,
+scale=1080:1920:
+force_original_aspect_ratio=decrease,
+pad=1080:1920:
+(ow-iw)/2:
+(oh-ih)/2,
+eq=
+contrast=1.10:
+saturation=1.18:
+brightness=0.02,
+unsharp=
+5:5:1.2:
+5:5:0
+[vbase]
+`,
+
+// BLOQUES
 
 "[vbase]trim=0:5,setpts=PTS-STARTPTS[v1]",
 
-// SLOW
-
-"[vbase]trim=5:9,setpts=2.0*(PTS-STARTPTS)[v2]",
-
-// FAST
+"[vbase]trim=5:9,setpts=2*(PTS-STARTPTS)[v2]",
 
 "[vbase]trim=9:12,setpts=0.6*(PTS-STARTPTS),tblend=average[v3]",
 
-// REVERSE
-
 "[vbase]trim=9:12,reverse,setpts=PTS-STARTPTS[v4]",
 
-// CONCAT
+// CORE
 
-"[v1][v2][v3][v4]concat=n=4:v=1:a=0[vcat]",
+"[v1][v2][v3][v4]concat=n=4:v=1:a=0[vcore]",
 
 // LOGO
 
-"[1:v]scale=280:-1[vlogo]",
+"[1:v]scale=220:-1[vlogo]",
 
-"[vcat][vlogo]overlay=W-w-70:H-h-90[vbranded]",
+"[vcore][vlogo]overlay=W-w-50:H-h-110[vbrand]",
+
+// INTRO
+
+"[2:v]scale=1080:1920[vintro]",
+
+// OUTRO
+
+"[3:v]scale=1080:1920[voutro]",
+
+// CONCAT FINAL
+
+"[vintro][vbrand][voutro]concat=n=3:v=1:a=0[vfinal]",
 
 // FADE
 
-"[vbranded]fade=t=in:st=0:d=1,fade=t=out:st=16:d=2[outv]"
+`
+[vfinal]
+fade=t=in:st=0:d=1,
+fade=t=out:st=19:d=1
+[outv]
+`
 
 ])
 
-      .outputOptions([
+.outputOptions([
 
-        "-map [outv]",
-        "-preset fast",
-        "-crf 18",
-        "-movflags +faststart"
+"-map [outv]",
 
-      ])
+"-map 4:a",
 
-      .videoCodec("libx264")
+"-t 20",
 
-      .save(output)
+"-shortest",
 
-      .on("end", () => {
+"-preset fast",
 
-        console.log("🎉 VIDEO RENDERIZADO");
+"-crf 18",
 
-        resolve();
-      })
+"-movflags +faststart"
 
-      .on("error", (err) => {
+])
 
-        console.error(err);
+.videoCodec(
+"libx264"
+)
 
-        reject(err);
-      });
+.audioCodec(
+"aac"
+)
 
-  });
+.save(
+output
+)
+
+.on(
+"end",
+()=>{
+
+console.log(
+"🎉 VIDEO RENDERIZADO"
+);
+
+resolve();
+
+}
+)
+
+.on(
+"error",
+(err)=>{
+
+console.error(
+err
+);
+
+reject(
+err
+);
+
+}
+);
+
+});
+
 }
 
 /* =========================================
@@ -198,10 +328,16 @@ async function renderVideo(input, output) {
 ========================================= */
 
 const PORT =
-  process.env.PORT || 3000;
+process.env.PORT
+|| 3000;
 
-app.listen(PORT, () => {
+app.listen(
+PORT,
+()=>{
 
-  console.log("🚀 RENDER WORKER ONLINE");
+console.log(
+"🚀 RENDER WORKER ONLINE"
+);
 
-});
+}
+);
