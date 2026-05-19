@@ -127,7 +127,7 @@ async function renderVideo(input, output) {
 // ORIENTATION + BASE LOOK
 // =========================
 
-"[0:v]scale=1080:1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2,eq=contrast=1.10:saturation=1.18:brightness=0.02,unsharp=5:5:1.2:5:5:0.0[vbase]",
+"[0:v]eq=contrast=1.10:saturation=1.18:brightness=0.02,unsharp=5:5:1.2:5:5:0.0[vbase]",
         // =========================
         // NORMAL
         // =========================
@@ -158,19 +158,19 @@ async function renderVideo(input, output) {
 
         "[v1][v2][v3][v4]concat=n=4:v=1:a=0[vcat]",
 
-       // =========================
+ // =========================
 // SNOOP FIXED BRAND
 // =========================
 
-"[1:v]scale=180:-1[vlogo]",
+"[1:v]scale=140:-1[vlogo]",
 
-"[vcat][vlogo]overlay=W-w-35:H-h-35[vbranded]",
+"[vcat][vlogo]overlay=W-w-30:H-h-30[vbranded]",
 
-        // =========================
-        // FADE IN / OUT
-        // =========================
+// =========================
+// FADE IN / OUT
+// =========================
 
-        "[vbranded]fade=t=in:st=0:d=1,fade=t=out:st=18:d=2[outv]"
+"[vbranded]fade=t=in:st=0:d=1,fade=t=out:st=16:d=2[outv]"
 
       ])
 
