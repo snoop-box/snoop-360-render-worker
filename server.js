@@ -176,14 +176,32 @@ ffmpeg()
 .input(input)
 
 .input(
-
 "assets/branding-overlay.png"
-
 )
+
+.input(
+"assets/intro.png"
+)
+
+.inputOptions([
+"-loop 1"
+])
+
+.input(
+"assets/outro.png"
+)
+
+.inputOptions([
+"-loop 1"
+])
 
 .complexFilter([
 
+// VIDEO BASE
+
 "[0:v]eq=contrast=1.10:saturation=1.18:brightness=0.02,unsharp=5:5:1.2:5:5:0.0[vbase]",
+
+// EFECTOS EXISTENTES
 
 "[vbase]trim=0:5,setpts=PTS-STARTPTS[v1]",
 
@@ -193,19 +211,41 @@ ffmpeg()
 
 "[vbase]trim=9:12,reverse,setpts=PTS-STARTPTS[v4]",
 
-"[v1][v2][v3][v4]concat=n=4:v=1:a=0[vcat]",
+// VIDEO CENTRAL
+
+"[v1][v2][v3][v4]concat=n=4:v=1:a=0[vcore]",
+
+// LOGO
 
 "[1:v]scale=240:-1[vlogo]",
 
-"[vcat][vlogo]overlay=W-w-50:H-h-120[vbrand]",
+"[vcore][vlogo]overlay=W-w-50:H-h-120[vbrand]",
 
-"[vbrand]fade=t=in:st=0:d=1,fade=t=out:st=16:d=2[outv]"
+// INTRO 2 SEG
+
+"[2:v]scale=1080:1920,trim=duration=2,setpts=PTS-STARTPTS[vintro]",
+
+// OUTRO 2 SEG
+
+"[3:v]scale=1080:1920,trim=duration=2,setpts=PTS-STARTPTS[voutro]",
+
+// VIDEO FINAL
+
+"[vintro][vbrand][voutro]concat=n=3:v=1:a=0[vfinal]",
+
+// FADE GLOBAL
+
+"[vfinal]fade=t=in:st=0:d=1,fade=t=out:st=20:d=2[outv]"
 
 ])
 
 .outputOptions([
 
 "-map [outv]",
+
+"-map 4:a",
+
+"-shortest",
 
 "-preset fast",
 
