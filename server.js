@@ -215,7 +215,7 @@ ffmpeg()
 
 // FRAME COMPLETO
 
-"[1:v]scale=480:640[vframe]",
+"[1:v]transpose=2,scale=480:640[vframe]",
 
 // VIDEO + FRAME
 
