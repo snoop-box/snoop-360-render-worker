@@ -179,65 +179,43 @@ ffmpeg()
 "assets/branding-overlay.png"
 )
 
-.input(
-"assets/intro.png"
-)
-
-.input(
-"assets/outro.png"
-)
-
-.inputOptions([
-"-loop 1",
-"-t 2"
-])
-
-.inputOptions([
-"-loop 1",
-"-t 2"
-])
-
 .complexFilter([
 
-// VIDEO BASE
+// ORIENTACION + BASE
 
-"[0:v]eq=contrast=1.10:saturation=1.18:brightness=0.02,unsharp=5:5:1.2:5:5:0.0[vbase]",
+"[0:v]transpose=1,scale=1080:1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2,eq=contrast=1.10:saturation=1.18:brightness=0.02,unsharp=5:5:1.2:5:5:0.0[vbase]",
 
-// EFECTOS EXISTENTES
+// NORMAL
 
-"[vbase]trim=0:5,setpts=PTS-STARTPTS[v1]",
+"[vbase]trim=0:6,setpts=PTS-STARTPTS[v1]",
 
-"[vbase]trim=5:9,setpts=2.0*(PTS-STARTPTS)[v2]",
+// SLOW
 
-"[vbase]trim=9:12,setpts=0.6*(PTS-STARTPTS),tblend=average[v3]",
+"[vbase]trim=6:10,setpts=2.0*(PTS-STARTPTS)[v2]",
 
-"[vbase]trim=9:12,reverse,setpts=PTS-STARTPTS[v4]",
+// FAST
 
-// VIDEO CENTRAL
+"[vbase]trim=10:14,setpts=0.7*(PTS-STARTPTS),tblend=average[v3]",
 
-"[v1][v2][v3][v4]concat=n=4:v=1:a=0[vcore]",
+// REVERSE
 
-// LOGO
-
-"[1:v]scale=240:-1[vlogo]",
-
-"[vcore][vlogo]overlay=W-w-50:H-h-120[vbrand]",
-
-// INTRO 2 SEG
-
-"[2:v]fps=30,scale=1080:1920,setpts=PTS-STARTPTS[vintro]",
-
-// OUTRO 2 SEG
-
-"[3:v]fps=30,scale=1080:1920,setpts=PTS-STARTPTS[voutro]",
+"[vbase]trim=10:14,reverse,setpts=PTS-STARTPTS[v4]",
 
 // VIDEO FINAL
 
-"[vintro][vbrand][voutro]concat=n=3:v=1:a=0[vfinal]",
+"[v1][v2][v3][v4]concat=n=4:v=1:a=0[vcat]",
 
-// FADE GLOBAL
+// LOGO GRANDE
 
-"[vfinal]fade=t=in:st=0:d=1,fade=t=out:st=20:d=2[outv]"
+"[1:v]scale=340:-1[vlogo]",
+
+// POSICION MAS BAJA
+
+"[vcat][vlogo]overlay=(W-w)/2:H-h-70[vbrand]",
+
+// FADE
+
+"[vbrand]fade=t=in:st=0:d=1,fade=t=out:st=20:d=2[outv]"
 
 ])
 
@@ -253,9 +231,13 @@ ffmpeg()
 
 ])
 
-.videoCodec("libx264")
+.videoCodec(
+"libx264"
+)
 
-.save(output)
+.save(
+output
+)
 
 .on(
 "end",
