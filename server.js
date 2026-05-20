@@ -173,11 +173,11 @@ return new Promise(
 
 ffmpeg()
 
+.input(input)
+
 .inputOptions([
 "-noautorotate"
 ])
-
-.input(input)
 
 .input(
 "assets/branding-overlay.png"
