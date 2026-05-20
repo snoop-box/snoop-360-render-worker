@@ -190,7 +190,6 @@ ffmpeg()
 .complexFilter([
 
 // BASE ORIGINAL
-// (VOLVEMOS AL ESTADO QUE FUNCIONABA)
 
 "[0:v]eq=contrast=1.10:saturation=1.18:brightness=0.02,unsharp=5:5:1.2:5:5:0.0[vbase]",
 
