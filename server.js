@@ -181,9 +181,10 @@ ffmpeg()
 
 .complexFilter([
 
-// ORIENTACION SIMPLE
+// BASE ORIGINAL
+// (VOLVEMOS AL ESTADO QUE FUNCIONABA)
 
-"[0:v]transpose=1[vbase]",
+"[0:v]eq=contrast=1.10:saturation=1.18:brightness=0.02,unsharp=5:5:1.2:5:5:0.0[vbase]",
 
 // NORMAL
 
@@ -201,7 +202,7 @@ ffmpeg()
 
 "[vbase]trim=10:14,reverse,setpts=PTS-STARTPTS[v4]",
 
-// VIDEO FINAL
+// CONCAT
 
 "[v1][v2][v3][v4]concat=n=4:v=1:a=0[vcat]",
 
@@ -209,7 +210,7 @@ ffmpeg()
 
 "[1:v]scale=340:-1[vlogo]",
 
-// POSICION MAS BAJA
+// LOGO CENTRADO ABAJO
 
 "[vcat][vlogo]overlay=(W-w)/2:H-h-70[vbrand]",
 
