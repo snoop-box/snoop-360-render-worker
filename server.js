@@ -179,6 +179,10 @@ ffmpeg()
 "assets/branding-overlay.png"
 )
 
+.input(
+"assets/music.mp3"
+)
+
 .complexFilter([
 
 // BASE ORIGINAL
@@ -206,29 +210,34 @@ ffmpeg()
 
 "[v1][v2][v3][v4]concat=n=4:v=1:a=0[vcat]",
 
-// LOGO GRANDE
+// FRAME COMPLETO
 
-"[1:v]scale=340:-1[vlogo]",
+"[1:v]scale=480:640[vframe]",
 
-// LOGO CENTRADO ABAJO
+// VIDEO + FRAME
 
-"[vcat][vlogo]overlay=(W-w)/2:H-h-70[vbrand]",
+"[vcat][vframe]overlay=0:0[vbrand]",
 
 // FADE
 
 "[vbrand]fade=t=in:st=0:d=1,fade=t=out:st=20:d=2[outv]"
-
 ])
 
 .outputOptions([
 
 "-map [outv]",
 
+"-map 2:a",
+
+"-shortest",
+
 "-preset fast",
 
 "-crf 18",
 
-"-movflags +faststart"
+"-movflags +faststart",
+
+"-af volume=0.35"
 
 ])
 
@@ -271,6 +280,40 @@ err
 });
 
 }
+
+/* =========================================
+   TEST LOCAL
+========================================= */
+
+app.get(
+"/test-render",
+async(req,res)=>{
+
+try{
+
+await renderVideo(
+"temp/test.mp4",
+"temp/test-output.mp4"
+);
+
+res.json({
+ok:true
+});
+
+}
+
+catch(err){
+
+console.error(err);
+
+res.status(500).json({
+ok:false,
+error:err.message
+});
+
+}
+
+});
 
 /* =========================================
    SERVER
