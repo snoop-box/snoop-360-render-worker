@@ -173,6 +173,10 @@ return new Promise(
 
 ffmpeg()
 
+.inputOptions([
+"-noautorotate"
+])
+
 .input(input)
 
 .input(
