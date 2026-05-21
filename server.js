@@ -215,7 +215,7 @@ ffmpeg()
 
 // FRAME COMPLETO
 
-"[1:v]transpose=2[vframe]",
+"[1:v]transpose=2,scale=480:640:force_original_aspect_ratio=decrease,pad=480:640:(ow-iw)/2:(oh-ih)/2[vframe]",
 
 // VIDEO + FRAME
 
