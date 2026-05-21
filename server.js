@@ -178,8 +178,23 @@ santo:
 
 };
 
-return overlays[eventId]
-|| "assets/branding-overlay.png";
+if(
+overlays[eventId]
+){
+
+console.log(
+"✅ OVERLAY REMOTO"
+);
+
+return overlays[eventId];
+
+}
+
+console.log(
+"⚠ OVERLAY DEFAULT"
+);
+
+return "assets/branding-overlay.png";
 
 }
 
