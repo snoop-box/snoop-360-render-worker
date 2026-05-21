@@ -171,11 +171,15 @@ console.log(
 `🖼 BUSCANDO OVERLAY ${eventId}`
 );
 
-return `https://res.cloudinary.com/${process.env.CLOUDINARY_CLOUD_NAME}/image/upload/snoopbox/${eventId}/overlay/branding-overlay.png`;
+const overlays = {
 
-}
+santo:
+"https://res.cloudinary.com/daxf4enjn/image/upload/v1779372827/branding-overlay_orywzx.png"
 
-return "assets/branding-overlay.png";
+};
+
+return overlays[eventId]
+|| "assets/branding-overlay.png";
 
 }
 
