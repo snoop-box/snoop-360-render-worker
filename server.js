@@ -167,12 +167,19 @@ async function downloadOverlay(
 eventId
 ){
 
+const cleanEventId =
+String(
+eventId || "default"
+)
+.trim()
+.toLowerCase();
+
 console.log(
-`🖼 BUSCANDO OVERLAY ${eventId}`
+`🖼 BUSCANDO OVERLAY ${cleanEventId}`
 );
 
 const overlayUrl =
-`https://res.cloudinary.com/${process.env.CLOUDINARY_CLOUD_NAME}/image/upload/${eventId}.png`;
+`https://res.cloudinary.com/${process.env.CLOUDINARY_CLOUD_NAME}/image/upload/${cleanEventId}.png`;
 
 try{
 
@@ -181,7 +188,7 @@ overlayUrl
 );
 
 console.log(
-`✅ OVERLAY ${eventId}`
+"✅ OVERLAY ENCONTRADO"
 );
 
 return overlayUrl;
