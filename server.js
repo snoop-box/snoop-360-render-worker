@@ -225,11 +225,15 @@ ffmpeg()
 
 "[v1][v2][v3][v4]concat=n=4:v=1:a=0[vcat]",
 
-// FADE
+// FRAME
 
-"[1:v]scale=480:640[vframe]",
+"[1:v]transpose=2[vframe]",
+
+// VIDEO + FRAME
 
 "[vcat][vframe]overlay=0:0[vbrand]",
+
+// FADE
 
 "[vbrand]fade=t=in:st=0:d=1,fade=t=out:st=20:d=2[outv]"
 
