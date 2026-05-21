@@ -159,10 +159,6 @@ finalEventId
 
 });
 
-/* =========================================
-   RENDER ENGINE
-========================================= */
-
 async function downloadOverlay(
 eventId
 ){
@@ -210,13 +206,29 @@ return `https://res.cloudinary.com/${process.env.CLOUDINARY_CLOUD_NAME}/image/up
 async function renderVideo(
 input,
 output,
-eventId="default-event"
+eventId="default"
 ){
 
-const overlayPath =
+let overlayPath;
+
+try{
+
+overlayPath =
 await downloadOverlay(
 eventId
 );
+
+}
+catch(err){
+
+console.log(
+"⚠ DEFAULT"
+);
+
+overlayPath =
+`https://res.cloudinary.com/${process.env.CLOUDINARY_CLOUD_NAME}/image/upload/default.png`;
+
+}
 
 return new Promise(
 (resolve,reject)=>{
@@ -348,7 +360,7 @@ try{
 await renderVideo(
 "temp/test.mp4",
 "temp/test-output.mp4",
-"santo"
+"tre"
 );
 
 res.json({
