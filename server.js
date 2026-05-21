@@ -179,6 +179,22 @@ ffmpeg()
 "-noautorotate"
 ])
 
+ffmpeg()
+
+.input(input)
+
+.inputOptions([
+"-noautorotate"
+])
+
+.input(
+"assets/branding-overlay.png"
+)
+
+.input(
+"assets/music.mp3"
+)
+
 .input(
 "assets/music.mp3"
 )
@@ -211,7 +227,11 @@ ffmpeg()
 
 // FADE
 
-"[vcat]fade=t=in:st=0:d=1,fade=t=out:st=20:d=2[outv]"
+"[1:v]scale=480:640[vframe]",
+
+"[vcat][vframe]overlay=0:0[vbrand]",
+
+"[vbrand]fade=t=in:st=0:d=1,fade=t=out:st=20:d=2[outv]"
 
 ])
 
@@ -219,7 +239,7 @@ ffmpeg()
 
 "-map [outv]",
 
-"-map 1:a",
+"-map 2:a",
 
 "-shortest",
 
