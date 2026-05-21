@@ -6,7 +6,6 @@ const axios = require("axios");
 const fs = require("fs-extra");
 const ffmpeg = require("fluent-ffmpeg");
 const cloudinary = require("cloudinary").v2;
-
 const app = express();
 
 app.use(cors());
@@ -96,9 +95,10 @@ app.post("/render360", async (req, res) => {
     );
 
     await renderVideo(
-      inputPath,
-      outputPath
-    );
+inputPath,
+outputPath,
+finalEventId
+);
 
     console.log(
       "☁ SUBIENDO FINAL..."
@@ -163,36 +163,48 @@ app.post("/render360", async (req, res) => {
    RENDER ENGINE
 ========================================= */
 
-async function renderVideo(
-  input,
-  output
+async function downloadOverlay(
+eventId
 ){
+
+console.log(
+`🖼 BUSCANDO OVERLAY ${eventId}`
+);
+
+return `https://res.cloudinary.com/${process.env.CLOUDINARY_CLOUD_NAME}/image/upload/snoopbox/${eventId}/overlay/branding-overlay.png`;
+
+}
+
+return "assets/branding-overlay.png";
+
+}
+
+async function renderVideo(
+input,
+output,
+eventId="default-event"
+){
+
+const overlayPath =
+await downloadOverlay(
+eventId
+);
 
 return new Promise(
 (resolve,reject)=>{
 
 ffmpeg()
 
-.input(input)
-
-.inputOptions([
-"-noautorotate"
-])
-
-ffmpeg()
-
-.input(input)
-
-.inputOptions([
-"-noautorotate"
-])
-
 .input(
-"assets/branding-overlay.png"
+input
 )
 
+.inputOptions([
+"-noautorotate"
+])
+
 .input(
-"assets/music.mp3"
+overlayPath
 )
 
 .input(
@@ -201,7 +213,7 @@ ffmpeg()
 
 .complexFilter([
 
-// BASE ORIGINAL
+// BASE
 
 "[0:v]eq=contrast=1.10:saturation=1.18:brightness=0.02,unsharp=5:5:1.2:5:5:0.0[vbase]",
 
@@ -225,11 +237,9 @@ ffmpeg()
 
 "[v1][v2][v3][v4]concat=n=4:v=1:a=0[vcat]",
 
-// FRAME
+// OVERLAY
 
 "[1:v]transpose=2[vframe]",
-
-// VIDEO + FRAME
 
 "[vcat][vframe]overlay=0:0[vbrand]",
 
@@ -309,7 +319,8 @@ try{
 
 await renderVideo(
 "temp/test.mp4",
-"temp/test-output.mp4"
+"temp/test-output.mp4",
+"santo"
 );
 
 res.json({
@@ -320,11 +331,16 @@ ok:true
 
 catch(err){
 
-console.error(err);
+console.error(
+err
+);
 
 res.status(500).json({
+
 ok:false,
+
 error:err.message
+
 });
 
 }
