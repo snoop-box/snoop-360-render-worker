@@ -180,10 +180,6 @@ ffmpeg()
 ])
 
 .input(
-"assets/branding-overlay.png"
-)
-
-.input(
 "assets/music.mp3"
 )
 
@@ -213,28 +209,17 @@ ffmpeg()
 
 "[v1][v2][v3][v4]concat=n=4:v=1:a=0[vcat]",
 
-// FRAME COMPLETO
-
-"[1:v]transpose=2,scale=480:640:force_original_aspect_ratio=decrease,pad=480:640:(ow-iw)/2:(oh-ih)/2[vframe]",
-
-// VIDEO + FRAME
-
-"[vcat][vframe]overlay=0:0[vbrand]",
-
-// VIDEO + FRAME
-
-"[vcat][vframe]overlay=0:0[vbrand]",
-
 // FADE
 
-"[vbrand]fade=t=in:st=0:d=1,fade=t=out:st=20:d=2[outv]"
+"[vcat]fade=t=in:st=0:d=1,fade=t=out:st=20:d=2[outv]"
+
 ])
 
 .outputOptions([
 
 "-map [outv]",
 
-"-map 2:a",
+"-map 1:a",
 
 "-shortest",
 
