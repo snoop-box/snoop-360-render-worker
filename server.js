@@ -171,30 +171,32 @@ console.log(
 `🖼 BUSCANDO OVERLAY ${eventId}`
 );
 
-const overlays = {
+const overlayUrl =
+`https://res.cloudinary.com/${process.env.CLOUDINARY_CLOUD_NAME}/image/upload/${eventId}.png`;
 
-santo:
-"https://res.cloudinary.com/daxf4enjn/image/upload/v1779372827/branding-overlay_orywzx.png"
+try{
 
-};
-
-if(
-overlays[eventId]
-){
-
-console.log(
-"✅ OVERLAY REMOTO"
+await axios.head(
+overlayUrl
 );
 
-return overlays[eventId];
+console.log(
+`✅ OVERLAY ${eventId}`
+);
+
+return overlayUrl;
 
 }
 
+catch(err){
+
 console.log(
-"⚠ OVERLAY DEFAULT"
+"⚠ DEFAULT"
 );
 
-return "assets/branding-overlay.png";
+return `https://res.cloudinary.com/${process.env.CLOUDINARY_CLOUD_NAME}/image/upload/default.png`;
+
+}
 
 }
 
