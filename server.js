@@ -96,9 +96,10 @@ app.post("/render360", async (req, res) => {
     );
 
     await renderVideo(
-      inputPath,
-      outputPath
-    );
+inputPath,
+outputPath,
+finalEventId
+);
 
     console.log(
       "☁ SUBIENDO FINAL..."
@@ -160,13 +161,67 @@ app.post("/render360", async (req, res) => {
 });
 
 /* =========================================
+   OVERLAY DINAMICO
+========================================= */
+
+async function downloadOverlay(
+eventId
+){
+
+const cleanEventId =
+String(
+eventId || "default"
+)
+.trim()
+.toLowerCase();
+
+console.log(
+`🖼 BUSCANDO OVERLAY ${cleanEventId}`
+);
+
+const overlayUrl =
+`https://res.cloudinary.com/${process.env.CLOUDINARY_CLOUD_NAME}/image/upload/${cleanEventId}.png`;
+
+try{
+
+await axios.get(
+overlayUrl
+);
+
+console.log(
+"✅ OVERLAY ENCONTRADO"
+);
+
+return overlayUrl;
+
+}
+
+catch(err){
+
+console.log(
+"⚠ DEFAULT"
+);
+
+return `https://res.cloudinary.com/${process.env.CLOUDINARY_CLOUD_NAME}/image/upload/default.png`;
+
+}
+
+}
+
+/* =========================================
    RENDER ENGINE
 ========================================= */
 
 async function renderVideo(
-  input,
-  output
+input,
+output,
+eventId="default"
 ){
+
+const overlayPath =
+await downloadOverlay(
+eventId
+);
 
 return new Promise(
 (resolve,reject)=>{
@@ -188,7 +243,7 @@ ffmpeg()
 ])
 
 .input(
-"assets/branding-overlay.png"
+overlayPath
 )
 
 .input(
@@ -303,28 +358,45 @@ err
 
 app.get(
 "/test-render",
-async(req,res)=>{
+async(
+req,
+res
+)=>{
 
 try{
 
+const eventId =
+req.query.event
+|| "default";
+
 await renderVideo(
 "temp/test.mp4",
-"temp/test-output.mp4"
+"temp/test-output.mp4",
+eventId
 );
 
 res.json({
-ok:true
+
+ok:true,
+
+event:eventId
+
 });
 
 }
 
 catch(err){
 
-console.error(err);
+console.error(
+err
+);
 
 res.status(500).json({
+
 ok:false,
+
 error:err.message
+
 });
 
 }
