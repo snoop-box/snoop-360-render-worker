@@ -304,9 +304,15 @@ overlayPath
 
 "-preset fast",
 
-"-crf 18",
+"-crf 20",
 
 "-movflags +faststart",
+
+"-pix_fmt yuv420p",
+
+"-profile:v main",
+
+"-level 4.0",
 
 "-af volume=0.35"
 
