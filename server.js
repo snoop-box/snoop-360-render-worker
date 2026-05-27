@@ -270,11 +270,11 @@ overlayPath
 
 // OVERLAY ESCALADO
 
-"[1:v]transpose=2,scale=120:-1[vframe]",
+"[1:v]transpose=2,scale=90:-1[vframe]",
 
 // VIDEO + OVERLAY ABAJO
 
-"[vcat][vframe]overlay=(W-w)/2:H-h-40[vbrand]",
+"[vcat][vframe]overlay=(W-w)/2:H-h-10[vbrand]",
 
 // FADE
 
