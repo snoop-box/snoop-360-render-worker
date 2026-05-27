@@ -268,7 +268,7 @@ overlayPath
 
 // REVERSE
 
-"[vbase]trim=10:14,reverse,setpts=PTS-STARTPTS[v4]",
+"[vbase]trim=10:13,reverse,setpts=PTS-STARTPTS[v4]",
 
 // CONCAT
 
@@ -284,7 +284,7 @@ overlayPath
 
 // FADE
 
-"[vbrand]fade=t=in:st=0:d=1,fade=t=out:st=20:d=2[outv]"
+"[vbrand]fade=t=in:st=0:d=1[outv]"
 
 ])
 
@@ -294,7 +294,7 @@ overlayPath
 
 "-map 2:a",
 
-"-shortest",
+"-t 22",
 
 "-preset fast",
 
