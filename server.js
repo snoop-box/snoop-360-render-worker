@@ -276,11 +276,11 @@ overlayPath
 
 // OVERLAY NORMAL
 
-"[1:v]scale=720:-1[vframe]",
+"[1:v]scale=720:-1,transpose=1[vframe]",
 
 // VIDEO + BRANDING ABAJO
 
-"[vcat][vframe]overlay=(W-w)/2:H-h-80[vbrand]",
+"[vcat][vframe]overlay=(W-w)/2:H-h-40[vbrand]",
 
 // FADE
 
