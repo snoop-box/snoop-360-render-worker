@@ -180,7 +180,7 @@ console.log(
 );
 
 const overlayUrl =
-`https://res.cloudinary.com/${process.env.CLOUDINARY_CLOUD_NAME}/image/upload/${cleanEventId}.png`;
+`https://res.cloudinary.com/${process.env.CLOUDINARY_CLOUD_NAME}/image/upload/v1779893898/360-${cleanEventId}.png`;
 
 try{
 
@@ -202,7 +202,7 @@ console.log(
 "⚠ DEFAULT"
 );
 
-return `https://res.cloudinary.com/${process.env.CLOUDINARY_CLOUD_NAME}/image/upload/default.png`;
+return `https://res.cloudinary.com/${process.env.CLOUDINARY_CLOUD_NAME}/image/upload/360-1.png`;
 
 }
 
@@ -234,20 +234,8 @@ ffmpeg()
 "-noautorotate"
 ])
 
-ffmpeg()
-
-.input(input)
-
-.inputOptions([
-"-noautorotate"
-])
-
 .input(
 overlayPath
-)
-
-.input(
-"assets/music.mp3"
 )
 
 .input(
@@ -280,13 +268,13 @@ overlayPath
 
 "[v1][v2][v3][v4]concat=n=4:v=1:a=0[vcat]",
 
-// FRAME
+// OVERLAY ESCALADO
 
-"[1:v]transpose=2[vframe]",
+"[1:v]scale=420:-1[vframe]",
 
-// VIDEO + FRAME
+// VIDEO + OVERLAY ABAJO
 
-"[vcat][vframe]overlay=0:0[vbrand]",
+"[vcat][vframe]overlay=(W-w)/2:H-h-40[vbrand]",
 
 // FADE
 
