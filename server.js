@@ -180,7 +180,10 @@ console.log(
 );
 
 const overlayUrl =
-`https://res.cloudinary.com/${process.env.CLOUDINARY_CLOUD_NAME}/image/upload/${cleanEventId}.png`;
+`https://res.cloudinary.com/${process.env.CLOUDINARY_CLOUD_NAME}/image/upload/v1779893898/360-${cleanEventId}.png`;
+
+const defaultOverlay =
+`https://res.cloudinary.com/${process.env.CLOUDINARY_CLOUD_NAME}/image/upload/v1779893898/360-1.png`;
 
 try{
 
@@ -189,20 +192,19 @@ overlayUrl
 );
 
 console.log(
-"✅ OVERLAY ENCONTRADO"
+"OVERLAY EVENTO"
 );
 
 return overlayUrl;
 
 }
-
 catch(err){
 
 console.log(
-"⚠ DEFAULT"
+"OVERLAY DEFAULT"
 );
 
-return `https://res.cloudinary.com/${process.env.CLOUDINARY_CLOUD_NAME}/image/upload/default.png`;
+return defaultOverlay;
 
 }
 
@@ -234,21 +236,13 @@ ffmpeg()
 "-noautorotate"
 ])
 
-ffmpeg()
-
-.input(input)
-
-.inputOptions([
-"-noautorotate"
-])
-
 .input(
 overlayPath
 )
 
-.input(
-"assets/music.mp3"
-)
+.inputOptions([
+"-loop 1"
+])
 
 .input(
 "assets/music.mp3"
@@ -280,13 +274,13 @@ overlayPath
 
 "[v1][v2][v3][v4]concat=n=4:v=1:a=0[vcat]",
 
-// FRAME
+// OVERLAY NORMAL
 
-"[1:v]transpose=2[vframe]",
+"[1:v]scale=720:-1[vframe]",
 
-// VIDEO + FRAME
+// VIDEO + BRANDING ABAJO
 
-"[vcat][vframe]overlay=0:0[vbrand]",
+"[vcat][vframe]overlay=(W-w)/2:H-h-80[vbrand]",
 
 // FADE
 
