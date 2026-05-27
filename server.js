@@ -274,7 +274,7 @@ overlayPath
 
 // VIDEO + OVERLAY ABAJO
 
-"[vcat][vframe]overlay=(W-w)/2:H-h-10[vbrand]",
+"[vcat][vframe]overlay=(W-w)/2:H-h+110[vbrand]",
 
 // FADE
 
