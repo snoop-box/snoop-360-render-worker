@@ -250,19 +250,19 @@ overlayPath
 
 // NORMAL
 
-"[vbase]trim=0:6,setpts=PTS-STARTPTS[v1]",
+"[vbase]trim=0:5,setpts=PTS-STARTPTS[v1]",
 
-// SLOW
+// SLOW HERO
 
-"[vbase]trim=6:10,setpts=2.0*(PTS-STARTPTS)[v2]",
+"[vbase]trim=5:9,setpts=2.8*(PTS-STARTPTS)[v2]",
 
-// FAST
+// FAST ENERGIA
 
-"[vbase]trim=10:14,setpts=0.7*(PTS-STARTPTS),tblend=average[v3]",
+"[vbase]trim=9:12,setpts=0.65*(PTS-STARTPTS),tblend=average[v3]",
 
-// REVERSE
+// REVERSE CORTO FINAL
 
-"[vbase]trim=10:14,reverse,setpts=PTS-STARTPTS[v4]",
+"[vbase]trim=12:14,reverse,setpts=PTS-STARTPTS[v4]",
 
 // CONCAT
 
