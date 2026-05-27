@@ -180,10 +180,7 @@ console.log(
 );
 
 const overlayUrl =
-`https://res.cloudinary.com/${process.env.CLOUDINARY_CLOUD_NAME}/image/upload/v1779893898/360-${cleanEventId}.png`;
-
-const defaultOverlay =
-`https://res.cloudinary.com/${process.env.CLOUDINARY_CLOUD_NAME}/image/upload/v1779893898/360-1.png`;
+`https://res.cloudinary.com/${process.env.CLOUDINARY_CLOUD_NAME}/image/upload/${cleanEventId}.png`;
 
 try{
 
@@ -192,19 +189,20 @@ overlayUrl
 );
 
 console.log(
-"OVERLAY EVENTO"
+"✅ OVERLAY ENCONTRADO"
 );
 
 return overlayUrl;
 
 }
+
 catch(err){
 
 console.log(
-"OVERLAY DEFAULT"
+"⚠ DEFAULT"
 );
 
-return defaultOverlay;
+return `https://res.cloudinary.com/${process.env.CLOUDINARY_CLOUD_NAME}/image/upload/default.png`;
 
 }
 
@@ -236,13 +234,21 @@ ffmpeg()
 "-noautorotate"
 ])
 
+ffmpeg()
+
+.input(input)
+
+.inputOptions([
+"-noautorotate"
+])
+
 .input(
 overlayPath
 )
 
-.inputOptions([
-"-loop 1"
-])
+.input(
+"assets/music.mp3"
+)
 
 .input(
 "assets/music.mp3"
@@ -268,23 +274,23 @@ overlayPath
 
 // REVERSE
 
-"[vbase]trim=10:13,reverse,setpts=PTS-STARTPTS[v4]",
+"[vbase]trim=10:14,reverse,setpts=PTS-STARTPTS[v4]",
 
 // CONCAT
 
 "[v1][v2][v3][v4]concat=n=4:v=1:a=0[vcat]",
 
-// OVERLAY NORMAL
+// FRAME
 
-"[1:v]scale=720:-1,transpose=1[vframe]",
+"[1:v]transpose=2[vframe]",
 
-// VIDEO + BRANDING ABAJO
+// VIDEO + FRAME
 
-"[vcat][vframe]overlay=(W-w)/2:H-h-40[vbrand]",
+"[vcat][vframe]overlay=0:0[vbrand]",
 
 // FADE
 
-"[vbrand]fade=t=in:st=0:d=1[outv]"
+"[vbrand]fade=t=in:st=0:d=1,fade=t=out:st=20:d=2[outv]"
 
 ])
 
@@ -294,7 +300,7 @@ overlayPath
 
 "-map 2:a",
 
-"-t 22",
+"-shortest",
 
 "-preset fast",
 
