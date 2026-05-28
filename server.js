@@ -291,7 +291,7 @@ overlayPath
 
 // BASE ORIGINAL
 
-"[0:v]scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,eq=contrast=1.10:saturation=1.18:brightness=0.02,unsharp=5:5:1.2:5:5:0.0[vbase]",
+"[0:v]eq=contrast=1.10:saturation=1.18:brightness=0.02,unsharp=5:5:1.2:5:5:0.0[vbase]",
 
 // NORMAL
 
@@ -311,7 +311,9 @@ overlayPath
 
 // CONCAT
 
-"[v1][v2][v3][v4]concat=n=4:v=1:a=0[vcat]",
+"[v1][v2][v3][v4]concat=n=4:v=1:a=0[vtemp]",
+
+"[vtemp]scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920[vcat]",
 
 // OVERLAY ESCALADO
 
