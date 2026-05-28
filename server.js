@@ -35,17 +35,15 @@ function execPromise(command) {
 
 async function normalizeVideo(inputPath, outputPath) {
 
-  const command = `
-ffmpeg -y \
--i "${inputPath}" \
--vf "scale=1080:1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2"
--r 30 \
--c:v libx264 \
--preset fast \
--crf 23 \
--c:a aac \
-"${outputPath}"
-`;
+const command =
+  `ffmpeg -y -i "${inputPath}" ` +
+  `-vf "scale=1080:1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2" ` +
+  `-r 30 ` +
+  `-c:v libx264 ` +
+  `-preset fast ` +
+  `-crf 23 ` +
+  `-c:a aac ` +
+  `"${outputPath}"`;
 
   console.log("Normalizando video...");
 
