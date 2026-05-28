@@ -37,7 +37,7 @@ async function normalizeVideo(inputPath, outputPath) {
 
 const command =
   `ffmpeg -y -i "${inputPath}" ` +
-  `-vf "scale=1080:1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2" ` +
+  `-vf "scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920" ` +
   `-r 30 ` +
   `-c:v libx264 ` +
   `-preset fast ` +
@@ -275,10 +275,6 @@ ffmpeg()
 
 .input(input)
 
-.inputOptions([
-"-noautorotate"
-])
-
 .input(
 overlayPath
 )
@@ -313,15 +309,13 @@ overlayPath
 
 "[v1][v2][v3][v4]concat=n=4:v=1:a=0[vtemp]",
 
-"[vtemp]scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920[vcat]",
-
 // OVERLAY ESCALADO
 
 "[1:v]scale=390:-1[vframe]",
 
 // VIDEO + OVERLAY ABAJO
 
-"[vcat][vframe]overlay=(W-w)/2:H-h-60[vbrand]",
+"[vtemp][vframe]overlay=(W-w)/2:H-h-60[vbrand]",
 
 // FADE
 
