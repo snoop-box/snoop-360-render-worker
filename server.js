@@ -37,7 +37,7 @@ async function normalizeVideo(inputPath, outputPath) {
 
 const command =
   `ffmpeg -y -i "${inputPath}" ` +
-  `-vf "scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920" ` +
+  `-vf "scale=-1:1920,crop=1080:1920" ` +
   `-r 30 ` +
   `-c:v libx264 ` +
   `-preset fast ` +
