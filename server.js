@@ -6,7 +6,7 @@ const axios = require("axios");
 const fs = require("fs-extra");
 const ffmpeg = require("fluent-ffmpeg");
 const cloudinary = require("cloudinary").v2;
-
+const path = require("path");
 const app = express();
 
 app.use(cors());
@@ -18,6 +18,41 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
+const { exec } = require("child_process");
+
+function execPromise(command) {
+  return new Promise((resolve, reject) => {
+    exec(command, (error, stdout, stderr) => {
+      if (error) {
+        console.error("FFmpeg error:", stderr);
+        reject(error);
+        return;
+      }
+      resolve(stdout);
+    });
+  });
+}
+
+async function normalizeVideo(inputPath, outputPath) {
+
+  const command = `
+ffmpeg -y \
+-i "${inputPath}" \
+-vf "scale=1080:1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2"
+-r 30 \
+-c:v libx264 \
+-preset fast \
+-crf 23 \
+-c:a aac \
+"${outputPath}"
+`;
+
+  console.log("Normalizando video...");
+
+  await execPromise(command);
+
+  console.log("Video normalizado.");
+}
 /* =========================================
    RENDER 360
 ========================================= */
@@ -95,10 +130,18 @@ app.post("/render360", async (req, res) => {
       "🎬 GENERANDO VIDEO..."
     );
 
-    await renderVideo(
-inputPath,
-outputPath,
-finalEventId
+    const normalizedPath =
+  `temp/normalized-${stamp}.mp4`;
+
+await normalizeVideo(
+  inputPath,
+  normalizedPath
+);
+
+await renderVideo(
+  normalizedPath,
+  outputPath,
+  finalEventId
 );
 
     console.log(
@@ -120,12 +163,16 @@ finalEventId
       );
 
     await fs.remove(
-      inputPath
-    );
+  inputPath
+);
 
-    await fs.remove(
-      outputPath
-    );
+await fs.remove(
+  normalizedPath
+);
+
+await fs.remove(
+  outputPath
+);
 
     console.log(
       "✅ RENDER FINAL OK"
