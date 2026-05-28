@@ -291,7 +291,7 @@ overlayPath
 
 // BASE ORIGINAL
 
-"[0:v]eq=contrast=1.10:saturation=1.18:brightness=0.02,unsharp=5:5:1.2:5:5:0.0[vbase]",
+"[0:v]scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,eq=contrast=1.10:saturation=1.18:brightness=0.02,unsharp=5:5:1.2:5:5:0.0[vbase]",
 
 // NORMAL
 
@@ -315,11 +315,11 @@ overlayPath
 
 // OVERLAY ESCALADO
 
-"[1:v]scale=360:-1[vframe]",
+"[1:v]scale=390:-1[vframe]",
 
 // VIDEO + OVERLAY ABAJO
 
-"[vcat][vframe]overlay=(W-w)/2:H-h-80[vbrand]",
+"[vcat][vframe]overlay=(W-w)/2:H-h-60[vbrand]",
 
 // FADE
 
