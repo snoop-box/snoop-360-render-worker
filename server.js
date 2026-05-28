@@ -315,7 +315,7 @@ overlayPath
 
 // OVERLAY ESCALADO
 
-"[1:v]scale=260:-1[vframe]",
+"[1:v]scale=360:-1[vframe]",
 
 // VIDEO + OVERLAY ABAJO
 
