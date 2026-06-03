@@ -37,7 +37,7 @@ async function normalizeVideo(inputPath, outputPath) {
 
 const command =
   `ffmpeg -y -i "${inputPath}" ` +
-  `-vf "scale=-1:1920,crop=1080:1920" ` +
+  `-vf "scale=-1:1280,crop=720:1280" ` +
   `-r 30 ` +
   `-c:v libx264 ` +
   `-preset fast ` +
@@ -311,7 +311,7 @@ overlayPath
 
 // OVERLAY ESCALADO
 
-"[1:v]scale=550:-1[vframe]",
+"[1:v]scale=360:-1[vframe]",
 
 // VIDEO + OVERLAY ABAJO
 
@@ -333,7 +333,7 @@ overlayPath
 
 "-preset fast",
 
-"-crf 20",
+"-b:v 3M",
 
 "-movflags +faststart",
 
