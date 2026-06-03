@@ -333,7 +333,7 @@ overlayPath
 
 "-preset fast",
 
-"-b:v 3M",
+"-crf 20",
 
 "-movflags +faststart",
 
